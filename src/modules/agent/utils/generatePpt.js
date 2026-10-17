@@ -1,4 +1,4 @@
-import pptxgen from "pptxgenjs";
+import PptxGenJS from "pptxgenjs/dist/pptxgen.cjs.js";
 import { uploadPpt } from "./uploader.js";
 
 export const generatePpt = async (data) => {
