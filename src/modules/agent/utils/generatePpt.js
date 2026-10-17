@@ -1,4 +1,7 @@
-import PptxGenJS from "pptxgenjs/dist/pptxgen.cjs.js";
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
+const PptxGenJS = require("pptxgenjs");
+
 import { uploadPpt } from "./uploader.js";
 
 export const generatePpt = async (data) => {
@@ -10,7 +13,7 @@ export const generatePpt = async (data) => {
     throw new Error("Presentation must contain at least one slide");
   }
 
-  const pptx = new pptxgen();
+  const pptx = new PptxGenJS();
 
   /*
    * =====================================================
