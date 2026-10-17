@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken";
 import { app as firebaseApp } from "../../config/firebase.js";
 import User from "./user.model.js";
 import { deductCreditsService, updateUserPaymentService } from "./auth.service.js";
+import connectDb from "../../config/db.js";
 
 /* ──────────────────────────────────────────────────────────────── */
 /*  Agent cost mapping                                            */
@@ -18,6 +19,7 @@ import { deductCreditsService, updateUserPaymentService } from "./auth.service.j
 
 export const login = async (req, res) => {
   try {
+    await connectDb();
     const { token } = req.body;
 
     if (!token) {
