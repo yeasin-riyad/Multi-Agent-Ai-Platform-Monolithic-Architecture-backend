@@ -14,7 +14,7 @@ const store_id = process.env.STORE_ID;
 const store_passwd = process.env.STORE_PASSWD;
 const is_live = process.env.IS_LIVE === "true";
 const BASE_URL = process.env.BASE_URL || "http://localhost:8000";
-const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:5173";
+const CLIENT_URL = process.env.FRONTEND_URL || "http://localhost:5173";
 
 const VALIDATION_API = is_live
   ? "https://securepay.sslcommerz.com/validator/api/validationserverAPI.php"
