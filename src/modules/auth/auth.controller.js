@@ -55,7 +55,7 @@ export const login = async (req, res) => {
     res.cookie("token", jwtToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "none",
+      sameSite: "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
@@ -74,7 +74,7 @@ export const logout = async (req, res) => {
     res.clearCookie("token", {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      sameSite: "lax",
     });
     return res.status(200).json({ message: "Logout Successfully" });
   } catch (error) {
@@ -204,5 +204,56 @@ export const deductCredits = async (req, res) => {
 
     console.error("deductCredits controller error:", error);
     return res.status(500).json({ message: error.message });
+  }
+};
+
+
+
+export const demoLogin = async (req, res) => {
+  try {
+    // Find the predefined demo account
+    let user = await User.findOne({
+      firebaseUid:process.env.FIREBASEUID,
+    });
+
+    // Create demo account if it doesn't exist
+    if (!user) {
+      user = await User.create({
+        firebaseUid:process.env.FIREBASEUID,
+        name: "Demo User",
+        email: "demo@intervexa.ai",
+        avatar: "",
+        credits: 200,
+      });
+    }
+
+    const jwtPayload = {
+      userId: user._id,
+      name: user.name,
+      email: user.email,
+      avatar: user.avatar,
+      credits: user.credits,
+      plan: user.plan,
+    };
+
+    const jwtToken = jwt.sign(jwtPayload, process.env.JWT_SECRET, {
+      expiresIn: "7d",
+    });
+
+    res.cookie("token", jwtToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    return res.status(200).json(user);
+  } catch (error) {
+    console.error("Demo Login Error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Demo login failed",
+    });
   }
 };
