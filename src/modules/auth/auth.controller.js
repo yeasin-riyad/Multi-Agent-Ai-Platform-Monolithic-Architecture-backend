@@ -209,17 +209,36 @@ export const deductCredits = async (req, res) => {
 
 
 
+
 export const demoLogin = async (req, res) => {
   try {
-    // Find the predefined demo account
+    // 1. Ensure MongoDB is connected
+    await connectDb();
+
+    // 2. Validate environment variables
+    if (!process.env.FIREBASEUID) {
+      return res.status(500).json({
+        success: false,
+        message: "Demo account configuration is missing.",
+      });
+    }
+
+    if (!process.env.JWT_SECRET) {
+      return res.status(500).json({
+        success: false,
+        message: "JWT secret is missing.",
+      });
+    }
+
+    // 3. Find predefined demo account
     let user = await User.findOne({
-      firebaseUid:process.env.FIREBASEUID,
+      firebaseUid: process.env.FIREBASEUID,
     });
 
-    // Create demo account if it doesn't exist
+    // 4. Create demo account if it doesn't exist
     if (!user) {
       user = await User.create({
-        firebaseUid:process.env.FIREBASEUID,
+        firebaseUid: process.env.FIREBASEUID,
         name: "Demo User",
         email: "demo@intervexa.ai",
         avatar: "",
@@ -227,6 +246,7 @@ export const demoLogin = async (req, res) => {
       });
     }
 
+    // 5. Generate JWT payload
     const jwtPayload = {
       userId: user._id,
       name: user.name,
@@ -236,10 +256,12 @@ export const demoLogin = async (req, res) => {
       plan: user.plan,
     };
 
+    // 6. Generate JWT token
     const jwtToken = jwt.sign(jwtPayload, process.env.JWT_SECRET, {
       expiresIn: "7d",
     });
 
+    // 7. Set authentication cookie
     res.cookie("token", jwtToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -247,13 +269,15 @@ export const demoLogin = async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
+    // 8. Return user
     return res.status(200).json(user);
+
   } catch (error) {
     console.error("Demo Login Error:", error);
 
     return res.status(500).json({
       success: false,
-      message: "Demo login failed",
+      message: error.message || "Demo login failed",
     });
   }
 };
