@@ -16,6 +16,7 @@ import connectDb from "../../config/db.js";
 /* ================================================================ */
 /*  LOGIN                                                         */
 /* ================================================================ */
+const isProduction = process.env.NODE_ENV === "production";
 
 export const login = async (req, res) => {
   try {
@@ -54,8 +55,9 @@ export const login = async (req, res) => {
 
     res.cookie("token", jwtToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
+      secure: isProduction,
+      sameSite: isProduction ? "none" : "lax",
+      path: "/",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
@@ -264,8 +266,9 @@ export const demoLogin = async (req, res) => {
     // 7. Set authentication cookie
     res.cookie("token", jwtToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
+      secure: isProduction,
+      sameSite: isProduction ? "none" : "lax",
+      path: "/",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
